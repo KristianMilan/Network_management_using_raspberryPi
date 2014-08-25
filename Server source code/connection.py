@@ -71,8 +71,19 @@ while 1:
     a=line.split()
     if(i==1):
       pi_id= int(a[0]) # find the raspberry pi id
-      
     if(i==2):
+      mac_id=a[0] #get the mac of connected access point
+
+    if(i==3):
+      latency=float(a[0]) # get the latency when pinged to 192.168.0.80
+      
+
+    if(i==4):
+      packet_loss=int(a[0]) #get the packet loss when pinged to 192.168.0.80
+
+
+    
+    if(i==5):
       ip=a[0] #get the ip addr of raspberrypi
       cursor.execute("select count(device_id) from device_info where device_id= %d "%(pi_id))
       count1=cursor.fetchone()
@@ -82,7 +93,7 @@ while 1:
         readsql= "update device_info set ip = '%s' where device_id = %d"%((ip),(pi_id))
         cursor.execute(readsql)
         cnx.commit      
-    if(i==3):
+    if(i==6):
       token= int(a[0].split('=')[-1]) #extract the token number
       print token
     if(a[0]=="IITH" or a[0]=="IITH-1" or a[0]=="IITH-Guest" or a[0]=="Test1"):
@@ -113,7 +124,10 @@ while 1:
 		#calculate mui which is the jst the conductivity factor
         mui=(20*log10(float(a[6])*1000)+20*log10(dist)+32.44)/abs(float(a[5]))
 		#insert the data into device_data table correspoding the device_id
-        readsql = "insert into device_data (channel,strength,pi_id,ap_id,token,mui) values (%d,%f,'%s','%s',%d,%f)"%((int(a[4])),(stre),(pi_id),(device_id),(token),(mui))
+        if(mac_id==a[1]):
+          readsql = "insert into device_data (channel,strength,pi_id,ap_id,token,mui,packet_loss,latency) values (%d,%f,'%s','%s',%d,%f,%d,%f)"%((int(a[4])),(stre),(pi_id),(device_id),(token),(mui),(packet_loss),(latency))
+        else:          
+          readsql = "insert into device_data (channel,strength,pi_id,ap_id,token,mui) values (%d,%f,'%s','%s',%d,%f)"%((int(a[4])),(stre),(pi_id),(device_id),(token),(mui))
         cursor.execute(readsql)
         print "end"
         cnx.commit()
