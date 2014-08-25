@@ -22,6 +22,12 @@ while [ $c -lt 1 ];
 do
 	#device_id into the file
 	echo "$device_id" > files_to_send/f$device_idile$a.txt
+	#Get the mac of connected access point
+	iwconfig wlan0 | grep "Access Point" | cut -d"t" -f2 | cut -d" " -f2 >> files_to_send/f$device_idile$a.txt
+	#Avg delay when pinging to 192.168.0.80
+	ping 192.168.0.80 -c 3 | tail -1 | cut -d"=" -f2 | cut -d"/" -f2 >> files_to_send/f$device_idile$a.txt
+	#Packet loss during pinging to 192.168.0.80
+	ping 192.168.0.80 -c 3 | grep -oP '\d+(?=% packet loss)' >> files_to_send/f$device_idile$a.txt
 	#getting the ip addr and writing to file
 	#change 'ra0' to 'wlan0' if you r using different wifi dongle other then GW-450D
 	ifconfig ra0 | sed -n 's/.*inet *addr:\([0-9\.]*\).*/\1/p' >> files_to_send/f$device_idile$a.txt
